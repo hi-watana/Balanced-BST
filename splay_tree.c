@@ -67,6 +67,29 @@ struct Node *search(struct Node *root, int key) {
     return splay(root, key);
 }
 
+struct Node *insert(struct Node *root, int key) {
+    if (root == NULL)
+        return newNode(key);
+
+    root = splay(root, key);
+
+    if (key < root->key) {
+        struct Node *node = newNode(key);
+        node->right = root;
+        node->left = root->left;
+        root->left = NULL;
+        return node;
+    }
+    if (key > root->key) {
+        struct Node *node = newNode(key);
+        node->left = root;
+        node->right = root->right;
+        root->right = NULL;
+        return node;
+    }
+    return root;
+}
+
 void preOrder(struct Node *root) {
     if (root != NULL) {
         printf("%d ", root->key);
@@ -76,18 +99,22 @@ void preOrder(struct Node *root) {
 }
 
 int main() {
-    //struct Node *root = NULL;
+    struct Node *root = NULL;
 
     //int n, m;
     //scanf("%d %d", &n, &m);
-    //for (int i = 0; i < n; i++) {
-    //    int a;
-    //    scanf(" %d", &a);
-    //    root = insert(root, a);
-    //}
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++) {
+        int a;
+        scanf(" %d", &a);
+        printf("%d ", a);
+        root = insert(root, a);
+    }
 
-    //preOrder(root);
-    //printf("\n");
+    printf("\n");
+    preOrder(root);
+    printf("\n");
 
     //for (int i = 0; i < m; i++) {
     //    int a;
@@ -97,15 +124,5 @@ int main() {
 
     //preOrder(root);
     //printf("\n");
-    struct Node *root = newNode(100);
-    root->left = newNode(50);
-    root->right = newNode(200);
-    root->left->left = newNode(40);
-    root->left->left->left = newNode(30);
-    root->left->left->left->left = newNode(20);
-
-    root = search(root, 20);
-    printf("Preorder traversal of the modified Splay tree is \n");
-    preOrder(root);
     return 0;
 }
