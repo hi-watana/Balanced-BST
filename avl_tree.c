@@ -83,20 +83,78 @@ struct Node *insert(struct Node *node, int key) {
     }
 
     // Left Right
-    // TODO fix key > node->right->key
     if (balance > 1 && key > node->left->key) {
         node->left = leftRotate(node->left);
         return rightRotate(node);
     }
 
     // Right Left
-    // TODO fix key < node->left->key
     if (balance < -1 && key < node->right->key) {
         node->right = rightRotate(node->right);
         return leftRotate(node);
     }
 
     return node;
+}
+
+struct Node *minValueNode(struct Node *node) {
+    if (node->left == NULL)
+        return node;
+    return minValueNode(node->left);
+}
+
+struct Node *delete(struct Node *root, int key) {
+    if (root == NULL)
+        return root;
+
+    if (key < root->key)
+        root->left = delete(root->left, key);
+    else if (key > root->key)
+        root->right = delete(root->right, key);
+    else {
+        if (root->left == NULL && root->right == NULL) {
+            free(root);
+            root = NULL;
+        } else if (root->left == NULL) {
+            struct Node *tmp = root->right;
+            *root = *tmp;
+            free(tmp);
+        } else if (root->right == NULL) {
+            struct Node *tmp = root->left;
+            *root = *tmp;
+            free(tmp);
+        } else {
+            struct Node *minNode = minValueNode(root->right);
+            root->key = minNode->key;
+            root->right = delete(root->right, minNode->key);
+        }
+    }
+
+    if (root == NULL)
+        return root;
+
+    root->height = 1 + max(height(root->left), height(root->right));
+    int balance = getBalance(root);
+
+    if (balance > 1) {
+        // Left Left
+        if (getBalance(root->left) >= 0)
+            return rightRotate(root);
+
+        // Left Right
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+    if (balance < -1) {
+        // Right Right
+        if (getBalance(root->right) < 0)
+            return leftRotate(root);
+
+        // Right Left
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+    return root;
 }
 
 void preOrder(struct Node *root) {
@@ -110,12 +168,21 @@ void preOrder(struct Node *root) {
 int main() {
     struct Node *root = NULL;
 
-    int n;
-    scanf("%d", &n);
+    int n, m;
+    scanf("%d %d", &n, &m);
     for (int i = 0; i < n; i++) {
         int a;
         scanf(" %d", &a);
         root = insert(root, a);
+    }
+
+    preOrder(root);
+    printf("\n");
+
+    for (int i = 0; i < m; i++) {
+        int a;
+        scanf(" %d", &a);
+        root = delete(root, a);
     }
 
     preOrder(root);
