@@ -90,6 +90,32 @@ struct Node *insert(struct Node *root, int key) {
     return root;
 }
 
+struct Node *maxValueNode(struct Node *root) {
+    if (root->right == NULL)
+        return root;
+    return maxValueNode(root->right);
+}
+
+struct Node *delete(struct Node *root, int key) {
+    if (root == NULL)
+        return root;
+
+    root = splay(root, key);
+
+    if (root->key != key)
+        return root;
+
+    struct Node *t1 = root->left, *t2 = root->right;
+    free(root);
+
+    if (t1 == NULL)
+        return t2;
+
+    t1 = splay(t1, maxValueNode(t1)->key);
+    t1->right = t2;
+    return t1;
+}
+
 void preOrder(struct Node *root) {
     if (root != NULL) {
         printf("%d ", root->key);
@@ -101,10 +127,8 @@ void preOrder(struct Node *root) {
 int main() {
     struct Node *root = NULL;
 
-    //int n, m;
-    //scanf("%d %d", &n, &m);
-    int n;
-    scanf("%d", &n);
+    int n, m;
+    scanf("%d %d", &n, &m);
     for (int i = 0; i < n; i++) {
         int a;
         scanf(" %d", &a);
@@ -114,15 +138,17 @@ int main() {
 
     printf("\n");
     preOrder(root);
+    printf("\n\n");
+
+    for (int i = 0; i < m; i++) {
+        int a;
+        scanf(" %d", &a);
+        printf("%d ", a);
+        root = delete(root, a);
+    }
+
     printf("\n");
-
-    //for (int i = 0; i < m; i++) {
-    //    int a;
-    //    scanf(" %d", &a);
-    //    root = delete(root, a);
-    //}
-
-    //preOrder(root);
-    //printf("\n");
+    preOrder(root);
+    printf("\n");
     return 0;
 }
