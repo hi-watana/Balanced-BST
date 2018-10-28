@@ -9,3 +9,6 @@ run:
 
 debug:
 	lldb a.out
+
+clean:
+	rm -rfv a.out a.out.dSYM/a.out a.out.dSYM/
